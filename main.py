@@ -40,7 +40,7 @@ async def obter_conselho(request: PerguntaRequest):
     
     try:
         response = client.models.generate_content(
-            model='gemini-1.5-flash-002',
+            model='gemini-2.5-flash',
             contents=request.pergunta,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
