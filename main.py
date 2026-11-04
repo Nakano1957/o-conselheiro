@@ -37,7 +37,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada usando o modelo atual ativo na infraestrutura da Groq
+        # Chamada usando o modelo padrão e universal da Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -49,7 +49,7 @@ async def obter_conselho(request: ConselhoRequest):
                     "content": request.pergunta
                 }
             ],
-            model="qwen/qwen3.6-27b",  # <-- MODELO ATUALIZADO E ATIVO NA GROQ
+            model="llama-3.1-8b-instant",  # <-- MODELO UNIVERSAL E ATIVO
             temperature=0.3,
         )
         
