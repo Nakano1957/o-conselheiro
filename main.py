@@ -16,8 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configuração 100% segura recomendada pelo GitHub e Render
-# O código lê a chave diretamente da memória do servidor do Render de forma invisível
+# Configuração segura da API da Groq
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 # Estrutura de dados que a API recebe (Request Body)
@@ -29,7 +28,7 @@ class ConselhoRequest(BaseModel):
 # Rota principal para obter o conselho estruturado
 @app.post("/api/conselho")
 async def obter_conselho(request: ConselhoRequest):
-    # O seu prompt espetacular usando a técnica Feynman nos 4 blocks estruturados
+    # O seu prompt espetacular usando a técnica Feynman nos 4 blocos estruturados
     system_instruction = (
         f"Você é O CONSELHEIRO, um mentor espiritual. Responda usando a técnica Feynman baseado na tradição {request.tradicao}. "
         f"Divida obrigatoriamente a resposta em quatro blocos utilizando títulos em Markdown: "
@@ -38,7 +37,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada ultra-rápida na infraestrutura da Groq
+        # Chamada usando o modelo estável e disponível na Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -50,7 +49,7 @@ async def obter_conselho(request: ConselhoRequest):
                     "content": request.pergunta
                 }
             ],
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-70b-versatile",  # <-- MODELO ATUALIZADO E DISPONÍVEL
             temperature=0.3,
         )
         
