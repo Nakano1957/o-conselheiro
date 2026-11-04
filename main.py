@@ -15,8 +15,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Sua_Chave_Gemini = "AQ.Ab8RN6Jcmc7AJrGfeFHDctyZenUh1AXS3S5iM3_gwfwlopTydg"
-client = genai.Client(api_key=Sua_Chave_Gemini)
+gemini_key = os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=gemini_key)
 
 DB_USUARIOS = {}
 
