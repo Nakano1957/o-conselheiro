@@ -2,20 +2,85 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>O Conselheiro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; display: flex; justify-content: center; align-items: center; height: 100vh; color: #f8fafc; overflow: hidden; }
-        .app-container { width: 100%; max-width: 420px; height: 100vh; background: #1e293b; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; }
-        @media (min-width: 640px) { .app-container { height: 85vh; border-radius: 16px; } header { border-top-left-radius: 16px; border-top-right-radius: 16px; } footer { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; } }
-        header { background: #020617; padding: 20px; border-bottom: 1px solid #334155; text-align: center; }
+        
+        /* CORREÇÃO MOBILE: Uso de min-height e dynamic viewport para evitar cortes de barra do navegador */
+        body { 
+            background: #0f172a; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            min-height: 100dvh; /* Altura dinâmica moderna */
+            color: #f8fafc; 
+            overflow: hidden; 
+        }
+
+        /* CORREÇÃO MOBILE: Altura dinâmica elástica para o container */
+        .app-container { 
+            width: 100%; 
+            max-width: 420px; 
+            height: 100vh; 
+            height: 100dvh;
+            background: #1e293b; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            border: 1px solid #334155; 
+        }
+
+        @media (min-width: 640px) { 
+            .app-container { 
+                height: 85vh; 
+                border-radius: 16px; 
+            } 
+            header { border-top-left-radius: 16px; border-top-right-radius: 16px; } 
+            footer { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; } 
+        }
+
+        header { background: #020617; padding: 16px 20px 12px 20px; border-bottom: 1px solid #334155; text-align: center; }
         header h1 { font-size: 22px; color: #fbbf24; font-weight: bold; }
-        .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #1e293b; }
+        
+        /* NOVO: Espaço elegante para a marca do Investidor/Patrocinador */
+        .sponsor-banner {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sponsor-banner strong {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        /* CORREÇÃO MOBILE: Garante que o chat use flex: 1 para empurrar o rodapé, sem estourar a tela */
+        .chat-box { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 16px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            background: #1e293b; 
+            -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+        }
+
         .msg { padding: 14px; border-radius: 16px; max-width: 85%; font-size: 15px; line-height: 1.5; word-wrap: break-word; }
         .msg-ia { background: rgba(51, 65, 85, 0.5); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.05); align-self: flex-start; }
         .msg-user { background: rgba(251, 191, 36, 0.15); color: #fff; border: 1px solid rgba(251, 191, 36, 0.3); align-self: flex-end; margin-left: auto; }
-        footer { padding: 16px; background: #020617; border-top: 1px solid #334155; }
+        
+        /* CORREÇÃO MOBILE: Padding seguro para evitar que teclados de celular cubram o campo */
+        footer { 
+            padding: 16px; 
+            background: #020617; 
+            border-top: 1px solid #334155;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* Proteção para iPhones novos */
+        }
+
         .input-group { display: flex; gap: 10px; }
         .input-group input { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
         .input-group input:focus { border-color: #fbbf24; }
@@ -27,7 +92,11 @@
 </head>
 <body>
     <div class="app-container">
-        <header><h1>O Conselheiro</h1></header>
+        <header>
+            <h1>O Conselheiro</h1>
+            <!-- Banner do patrocinador integrado -->
+            <div class="sponsor-banner">Oferecido por: <strong>Sua Marca Aqui</strong></div>
+        </header>
         <div id="chat" class="chat-box">
             <div class="msg msg-ia">Olá, meu filho. O que está afligindo o seu coração hoje?</div>
         </div>
@@ -50,14 +119,12 @@
             chat.innerHTML += `<div id="${loaderId}" class="loader">O Conselheiro está refletindo...</div>`;
             chat.scrollTop = chat.scrollHeight;
             try {
-                // CORRIGIDO: Agora aponta para a rota relativa correta da API interna do seu servidor
                 const response = await fetch("/api/conselho", {
                     method: "POST", headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ usuario_id: "user_mvp", pergunta: texto, tradicao: "Católica" })
                 });
                 const data = await response.json(); document.getElementById(loaderId).remove();
                 
-                // CORRIGIDO: Ajustado de data.resposta para data.conselho (conforme main.py)
                 if (data && data.conselho) {
                     chat.innerHTML += `<div class="msg msg-ia">${formatarTexto(data.conselho)}</div>`;
                 } else {
@@ -71,3 +138,4 @@
     </script>
 </body>
 </html>
+
