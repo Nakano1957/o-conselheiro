@@ -9,7 +9,7 @@ from groq import Groq
 # Inicializa o FastAPI
 app = FastAPI(title="O Conselheiro API", version="0.1.0")
 
-# Configuração de CORS (Permite que o app seja acessado de qualquer lugar)
+# Configuração de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -55,10 +55,10 @@ async def obter_conselho(request: ConselhoRequest):
         )
         
         try:
-            conselho = chat_completion.choices[0].message.content
+            conselho = chat_completion.choices.message.content
         except (AttributeError, TypeError):
             try:
-                conselho = chat_completion.choices[0]['message']['content']
+                conselho = chat_completion.choices['message']['content']
             except Exception:
                 conselho = str(chat_completion)
 
@@ -67,15 +67,15 @@ async def obter_conselho(request: ConselhoRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno no Conselheiro: {str(e)}")
 
-# --- CONFIGURAÇÃO DA INTERFACE VISUAL COM BUSCA AUTOMÁTICA ---
+# --- CONFIGURAÇÃO DA INTERFACE VISUAL CORRIGIDA ---
 
 @app.get("/")
 def home():
-    # Caminhos mais comuns onde o arquivo pode estar escondido
+    # Incluído o nome 'html.index' que está no seu GitHub
     caminhos_possiveis = [
+        "html.index",
         "index.html", 
         "templates/index.html", 
-        "frontend/index.html",
         "Index.html"
     ]
     
@@ -83,15 +83,7 @@ def home():
         if os.path.exists(caminho):
             return FileResponse(caminho)
             
-    # Se não achar em nenhum lugar padrão, varre as pastas para descobrir onde ele está
-    arquivos_encontrados = []
-    for raiz, diretorios, arquivos in os.walk("."):
-        for arquivo in arquivos:
-            if arquivo.lower().endswith(".html"):
-                arquivos_encontrados.append(os.path.join(raiz, arquivo))
-                
     return {
-        "status": "API Online, mas o index.html não foi achado nos locais padrão.",
-        "arquivos_html_encontrados_no_projeto": arquivos_encontrados,
-        "dica": "Verifique se o seu arquivo HTML está na raiz com o nome exatamente em minúsculo: index.html"
+        "status": "API Online, mas o arquivo visual não foi achado.",
+        "dica": "Verifique o nome do seu arquivo de tela."
     }
