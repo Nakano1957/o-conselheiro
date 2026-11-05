@@ -37,36 +37,35 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada oficial com o modelo estável Llama 3.3
+        # ATUALIZADO: Usando o modelo de produção estável e ativo da Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": request.pergunta}
             ],
-            model="llama-3.3-70b-versatile",
+            model="llama-3.3-70b-specdec",
             temperature=0.3,
         )
         
-        # CORREÇÃO CRÍTICA: Adicionado o índice [0] obrigatório da biblioteca Groq
+        # Leitura estruturada da resposta da API da Groq
         try:
             conselho = chat_completion.choices[0].message.content
         except (AttributeError, TypeError, IndexError):
             try:
-                conselho = chat_completion.choices[0]['message']['content']
+                conselho = chat_completion.choices['message']['content']
             except Exception:
                 conselho = str(chat_completion)
 
         return {"conselho": conselho}
 
     except Exception as e:
-        # Retorna o erro detalhado diretamente para ajudar no diagnóstico visual
+        # Se falhar, retorna o erro detalhado diretamente para ajudar no diagnóstico visual
         return {"conselho": f"#### **Erro de Comunicação com a Groq:**\n{str(e)}"}
 
-# --- CONFIGURAÇÃO DA INTERFACE VISUAL CORRIGIDA ---
+# --- CONFIGURAÇÃO DA INTERFACE VISUAL ---
 
 @app.get("/")
 def home():
-    # Focado no arquivo correto: index.html
     caminhos_possiveis = [
         "index.html", 
         "templates/index.html", 
