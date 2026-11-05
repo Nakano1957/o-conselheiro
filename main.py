@@ -38,7 +38,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # ATUALIZADO: Usando o modelo oficial, rápido e estável da Groq (Llama 3.3)
+        # Usando o modelo oficial, rápido e estável da Groq (Llama 3.3)
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -67,19 +67,31 @@ async def obter_conselho(request: ConselhoRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno no Conselheiro: {str(e)}")
 
-# --- CONFIGURAÇÃO DA INTERFACE VISUAL ---
-
-# Verifica se a pasta 'templates' ou onde estão seus arquivos HTML existe
-# Se você tiver arquivos CSS/JS numa pasta chamada 'static', descomente a linha abaixo:
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+# --- CONFIGURAÇÃO DA INTERFACE VISUAL COM BUSCA AUTOMÁTICA ---
 
 @app.get("/")
 def home():
-    # Procura pelo arquivo index.html na raiz do projeto
-    if os.path.exists("index.html"):
-        return FileResponse("index.html")
-    # Se o index.html estiver dentro de uma pasta chamada 'templates', mudamos para "templates/index.html"
-    elif os.path.exists("templates/index.html"):
-        return FileResponse("templates/index.html")
-    else:
-        return {"status": "API Online, mas o arquivo index.html não foi encontrado na raiz do projeto!"}
+    # Caminhos mais comuns onde o arquivo pode estar escondido
+    caminhos_possiveis = [
+        "index.html", 
+        "templates/index.html", 
+        "frontend/index.html",
+        "Index.html"
+    ]
+    
+    for caminho in caminhos_possiveis:
+        if os.path.exists(caminho):
+            return FileResponse(caminho)
+            
+    # Se não achar em nenhum lugar padrão, varre as pastas para descobrir onde ele está
+    arquivos_encontrados = []
+    for raiz, diretorios, arquivos in os.walk("."):
+        for arquivo in arquivos:
+            if arquivo.lower().endswith(".html"):
+                arquivos_encontrados.append(os.path.join(raiz, arquivo))
+                
+    return {
+        "status": "API Online, mas o index.html não foi achado nos locais padrão.",
+        "arquivos_html_encontrados_no_projeto": arquivos_encontrados,
+        "dica": "Verifique se o seu arquivo HTML está na raiz com o nome exatamente em minúsculo: index.html"
+    }
