@@ -1,4 +1,5 @@
 import os
+import re
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -26,6 +27,17 @@ class ConselhoRequest(BaseModel):
     pergunta: str
     tradicao: str
 
+# Função auxiliar para neutralizar termos confessionais e torná-los universais
+def ecumenizar_texto(texto: str) -> str:
+    if not texto:
+        return texto
+    # Substituições para tornar o texto puramente cristão/ecumênico
+    texto = re.sub(r'\bCatólica\b', 'Cristã', texto)
+    texto = re.sub(r'\bcatólica\b', 'cristã', texto)
+    texto = re.sub(r'\bCatólico\b', 'Cristão', texto)
+    texto = re.sub(r'\bcatólico\b', 'cristão', texto)
+    return texto
+
 # Rota para buscar o conselho estruturado na Groq
 @app.post("/api/conselho")
 async def obter_conselho(request: ConselhoRequest):
@@ -33,11 +45,11 @@ async def obter_conselho(request: ConselhoRequest):
         f"Você é O CONSELHEIRO, um mentor espiritual. Responda usando a técnica Feynman baseado na tradição {request.tradicao}. "
         f"Divida obrigatoriamente a resposta em quatro blocos utilizando títulos em Markdown: "
         f"#### **Em poucas palavras:**, #### **Imagine assim:**, #### **O que diz a Minha Palavra:** e #### **Para o seu dia a dia:**. "
-        f"Seja acolhedor e fale em primeira pessoa."
+        f"Seja acolhedor, ecumênico, focado no amor de Cristo e fale em primeira pessoa."
     )
     
     try:
-        # ATUALIZADO: Usando o modelo de produção oficial e ativo na plataforma da Groq
+        # Usando o modelo de produção oficial e ativo na plataforma da Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_instruction},
@@ -55,11 +67,14 @@ async def obter_conselho(request: ConselhoRequest):
                 conselho = chat_completion.choices['message']['content']
             except Exception:
                 try:
-                    conselho = chat_completion.choices.message.content
+                    conselho = chat_completion.choices[0].message.content
                 except Exception as e:
                     conselho = f"#### **Erro de Processamento:**\nNão consegui extrair o texto. Detalhe: {str(e)}"
 
-        return {"conselho": conselho}
+        # Aplica a higienização de termos antes de devolver para a interface do usuário
+        conselho_higienizado = ecumenizar_texto(conselho)
+
+        return {"conselho": conselho_higienizado}
 
     except Exception as e:
         # Retorna o erro detalhado diretamente para ajudar no diagnóstico visual
