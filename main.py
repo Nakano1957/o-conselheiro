@@ -1,13 +1,15 @@
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from groq import Groq
 
 # Inicializa o FastAPI
 app = FastAPI(title="O Conselheiro API", version="0.1.0")
 
-# Configuração de CORS (Permite que o app seja acessado de qualquer lugar, inclusive celulares)
+# Configuração de CORS (Permite que o app seja acessado de qualquer lugar)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,10 +27,9 @@ class ConselhoRequest(BaseModel):
     pergunta: str
     tradicao: str
 
-# Rota principal para obter o conselho estruturado
+# Rota para buscar o conselho estruturado na Groq
 @app.post("/api/conselho")
 async def obter_conselho(request: ConselhoRequest):
-    # O seu prompt espetacular usando a técnica Feynman nos 4 blocos estruturados
     system_instruction = (
         f"Você é O CONSELHEIRO, um mentor espiritual. Responda usando a técnica Feynman baseado na tradição {request.tradicao}. "
         f"Divida obrigatoriamente a resposta em quatro blocos utilizando títulos em Markdown: "
@@ -37,7 +38,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada usando o modelo estável que funcionou na sua conta
+        # ATUALIZADO: Usando o modelo oficial, rápido e estável da Groq (Llama 3.3)
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -49,12 +50,10 @@ async def obter_conselho(request: ConselhoRequest):
                     "content": request.pergunta
                 }
             ],
-            model="openai/gpt-oss-20b",
+            model="llama-3.3-70b-versatile",
             temperature=0.3,
         )
         
-        # CORREÇÃO DO ERRO DE LEITURA DA LISTA:
-        # Tenta ler no formato padrão. Se der erro de atributo, lê como dicionário/lista pura.
         try:
             conselho = chat_completion.choices[0].message.content
         except (AttributeError, TypeError):
@@ -63,12 +62,24 @@ async def obter_conselho(request: ConselhoRequest):
             except Exception:
                 conselho = str(chat_completion)
 
-        return conselho
+        return {"conselho": conselho}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno no Conselheiro: {str(e)}")
 
-# Rota simples de teste para garantir que a API está viva
+# --- CONFIGURAÇÃO DA INTERFACE VISUAL ---
+
+# Verifica se a pasta 'templates' ou onde estão seus arquivos HTML existe
+# Se você tiver arquivos CSS/JS numa pasta chamada 'static', descomente a linha abaixo:
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.get("/")
 def home():
-    return {"status": "O Conselheiro está online e operando com a Groq!"}
+    # Procura pelo arquivo index.html na raiz do projeto
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    # Se o index.html estiver dentro de uma pasta chamada 'templates', mudamos para "templates/index.html"
+    elif os.path.exists("templates/index.html"):
+        return FileResponse("templates/index.html")
+    else:
+        return {"status": "API Online, mas o arquivo index.html não foi encontrado na raiz do projeto!"}
