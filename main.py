@@ -37,29 +37,32 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # ATUALIZADO: Usando o modelo de produção estável e ativo da Groq
+        # ATUALIZADO: Usando o modelo de produção oficial e ativo na plataforma da Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": request.pergunta}
             ],
-            model="llama-3.3-70b-specdec",
+            model="openai/gpt-oss-20b",
             temperature=0.3,
         )
         
-        # Leitura estruturada da resposta da API da Groq
+        # Leitura estruturada e resiliente da resposta
         try:
             conselho = chat_completion.choices[0].message.content
         except (AttributeError, TypeError, IndexError):
             try:
                 conselho = chat_completion.choices['message']['content']
             except Exception:
-                conselho = str(chat_completion)
+                try:
+                    conselho = chat_completion.choices.message.content
+                except Exception as e:
+                    conselho = f"#### **Erro de Processamento:**\nNão consegui extrair o texto. Detalhe: {str(e)}"
 
         return {"conselho": conselho}
 
     except Exception as e:
-        # Se falhar, retorna o erro detalhado diretamente para ajudar no diagnóstico visual
+        # Retorna o erro detalhado diretamente para ajudar no diagnóstico visual
         return {"conselho": f"#### **Erro de Comunicação com a Groq:**\n{str(e)}"}
 
 # --- CONFIGURAÇÃO DA INTERFACE VISUAL ---
