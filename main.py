@@ -2,14 +2,13 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from groq import Groq
 
 # Inicializa o FastAPI
 app = FastAPI(title="O Conselheiro API", version="0.1.0")
 
-# Configuração de CORS
+# Configuração de CORS (Permite conexões do frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -38,42 +37,37 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Usando o modelo oficial, rápido e estável da Groq (Llama 3.3)
+        # Chamada oficial com o modelo estável Llama 3.3
         chat_completion = client.chat.completions.create(
             messages=[
-                {
-                    "role": "system",
-                    "content": system_instruction
-                },
-                {
-                    "role": "user",
-                    "content": request.pergunta
-                }
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": request.pergunta}
             ],
             model="llama-3.3-70b-versatile",
             temperature=0.3,
         )
         
+        # CORREÇÃO CRÍTICA: Adicionado o índice [0] obrigatório da biblioteca Groq
         try:
-            conselho = chat_completion.choices.message.content
-        except (AttributeError, TypeError):
+            conselho = chat_completion.choices[0].message.content
+        except (AttributeError, TypeError, IndexError):
             try:
-                conselho = chat_completion.choices['message']['content']
+                conselho = chat_completion.choices[0]['message']['content']
             except Exception:
                 conselho = str(chat_completion)
 
         return {"conselho": conselho}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno no Conselheiro: {str(e)}")
+        # Retorna o erro detalhado diretamente para ajudar no diagnóstico visual
+        return {"conselho": f"#### **Erro de Comunicação com a Groq:**\n{str(e)}"}
 
 # --- CONFIGURAÇÃO DA INTERFACE VISUAL CORRIGIDA ---
 
 @app.get("/")
 def home():
-    # Incluído o nome 'html.index' que está no seu GitHub
+    # Focado no arquivo correto: index.html
     caminhos_possiveis = [
-        "html.index",
         "index.html", 
         "templates/index.html", 
         "Index.html"
@@ -84,6 +78,6 @@ def home():
             return FileResponse(caminho)
             
     return {
-        "status": "API Online, mas o arquivo visual não foi achado.",
-        "dica": "Verifique o nome do seu arquivo de tela."
+        "status": "API Online, mas o arquivo index.html não foi achado na raiz.",
+        "dica": "Verifique se o nome do arquivo no seu GitHub está exatamente minúsculo como index.html"
     }
