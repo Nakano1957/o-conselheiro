@@ -37,7 +37,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada usando o modelo padrão e universal da Groq
+        # Chamada usando o modelo atualizado, ativo e oficial da Groq para 2026
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -49,7 +49,7 @@ async def obter_conselho(request: ConselhoRequest):
                     "content": request.pergunta
                 }
             ],
-            model="llama-3.1-8b-instant",  # <-- MODELO UNIVERSAL E ATIVO
+            model="openai/gpt-oss-20b",  # <-- MODELO SUBSTITUTO ATIVO NA CAMADA FREE/DEVELOPER
             temperature=0.3,
         )
         
