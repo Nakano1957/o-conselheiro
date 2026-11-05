@@ -37,7 +37,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Chamada usando o modelo atualizado, ativo e oficial da Groq para 2026
+        # Chamada usando o modelo estável que funcionou na sua conta
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -49,12 +49,20 @@ async def obter_conselho(request: ConselhoRequest):
                     "content": request.pergunta
                 }
             ],
-            model="openai/gpt-oss-20b",  # <-- MODELO SUBSTITUTO ATIVO NA CAMADA FREE/DEVELOPER
+            model="openai/gpt-oss-20b",
             temperature=0.3,
         )
         
-        # Extrai o texto gerado pela IA e retorna para o usuário
-        conselho = chat_completion.choices.message.content
+        # CORREÇÃO DO ERRO DE LEITURA DA LISTA:
+        # Tenta ler no formato padrão. Se der erro de atributo, lê como dicionário/lista pura.
+        try:
+            conselho = chat_completion.choices[0].message.content
+        except (AttributeError, TypeError):
+            try:
+                conselho = chat_completion.choices[0]['message']['content']
+            except Exception:
+                conselho = str(chat_completion)
+
         return conselho
 
     except Exception as e:
