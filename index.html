@@ -13,7 +13,7 @@
         .app-container { width: 100%; max-width: 420px; height: 100dvh; background: #1e293b; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; }
         @media (min-width: 640px) { .app-container { height: 90vh; border-radius: 16px; } header { border-top-left-radius: 16px; border-top-right-radius: 16px; } footer { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; } }
         
-        /* Topo limpo e preparado para Patrocínio / Membros */
+        /* Topo estratégico livre para monetização */
         header { background: #020617; padding: 12px 20px; border-bottom: 1px solid #334155; text-align: center; position: relative; }
         header h1 { font-size: 18px; color: #fbbf24; font-weight: bold; }
         .patrocinio-space { font-size: 11px; color: #64748b; margin-top: 2px; font-style: italic; }
@@ -25,18 +25,24 @@
         .msg-ia { background: rgba(51, 65, 85, 0.5); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.05); align-self: flex-start; }
         .msg-user { background: rgba(251, 191, 36, 0.15); color: #fff; border: 1px solid rgba(251, 191, 36, 0.3); align-self: flex-end; margin-left: auto; }
         
-        /* Rodapé Ajustado e Compacto */
+        /* Rodapé com campo máximo e dois botões de ação */
         footer { padding: 12px; background: #020617; border-top: 1px solid #334155; }
-        .input-container { display: flex; flex-direction: column; gap: 8px; }
-        .input-group { display: flex; gap: 8px; align-items: center; }
-        .input-group input { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 15px; outline: none; }
-        .input-group input:focus { border-color: #fbbf24; }
+        .input-container { display: flex; flex-direction: column; gap: 10px; }
         
-        /* Seletor Discreto com Seta ao lado do botão de enviar */
-        .select-tradicao { background: #1e293b; color: #f1f5f9; border: 1px solid #475569; border-radius: 12px; padding: 11px 10px; font-size: 14px; outline: none; cursor: pointer; font-weight: 500; max-width: 130px; }
-        .select-tradicao:focus { border-color: #fbbf24; }
+        /* Campo de texto expandido ocupando a linha inteira */
+        .input-group-top { width: 100%; }
+        .input-group-top input { width: 100%; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 14px; color: #fff; font-size: 15px; outline: none; }
+        .input-group-top input:focus { border-color: #fbbf24; }
         
-        .btn-enviar { background: #fbbf24; color: #0f172a; border: none; border-radius: 12px; padding: 11px 18px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        /* Linha com os dois botões de envio lado a lado */
+        .buttons-group { display: flex; gap: 10px; width: 100%; }
+        .btn-enviar { flex: 1; background: #334155; color: #fff; border: 1px solid #475569; border-radius: 12px; padding: 12px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
+        
+        /* Destorcer cores para dar identidade aos botões */
+        .btn-catolica { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.05); }
+        .btn-evangelica { border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.05); }
+        .btn-catolica:active { background: #fbbf24; color: #0f172a; }
+        .btn-evangelica:active { background: #38bdf8; color: #0f172a; }
         
         .loader { font-style: italic; color: #94a3b8; font-size: 14px; padding-left: 4px; }
         h4 { margin-top: 12px; margin-bottom: 4px; color: #fbbf24; font-size: 16px; }
@@ -47,27 +53,25 @@
     <div class="app-container">
         <header>
             <h1>O Conselheiro</h1>
-            <!-- Espaço reservado e estratégico para monetização -->
             <div class="patrocinio-space">Espaço para Membro Parceiro / Patrocinador</div>
             <button id="btnInstalar">Instalar</button>
         </header>
         
         <div id="chat" class="chat-box">
-            <div class="msg msg-ia">Olá, meu filho. O que está afligindo o seu coração hoje? Digite sua dúvida abaixo e escolha sua leitura de fé ao lado do botão de envio.</div>
+            <!-- Chamada inicial limpa e acolhedora -->
+            <div class="msg msg-ia">Olá, meu filho. O que está afligindo o seu coração hoje?</div>
         </div>
         
         <footer>
             <div class="input-container">
-                <div class="input-group">
-                    <input type="text" id="inp" placeholder="Desabafe aqui..." onkeypress="if(event.key==='Enter') send()">
-                    
-                    <!-- Menu dropdown discreto com a setinha nativa ao lado do botão -->
-                    <select id="selectTradicao" class="select-tradicao">
-                        <option value="Católica">🕊️ Católica</option>
-                        <option value="Evangélica">📖 Evangélica</option>
-                    </select>
-                    
-                    <button class="btn-enviar" onclick="send()">➔</button>
+                <!-- Campo de digitação expandido -->
+                <div class="input-group-top">
+                    <input type="text" id="inp" placeholder="Desabafe aqui ou digite sua dúvida!">
+                </div>
+                <!-- Dois botões de envio com suas respectivas setas de ação -->
+                <div class="buttons-group">
+                    <button class="btn-enviar btn-catolica" onclick="send('Católica')">🕊️ Católica ➔</button>
+                    <button class="btn-enviar btn-evangelica" onclick="send('Evangélica')">📖 Evangélica ➔</button>
                 </div>
             </div>
         </footer>
@@ -100,9 +104,8 @@
             return texto.replace(/\n/g, '<br>').replace(/#### \*\*([^*]+):\*\*/g, '<h4><b>$1:</b></h4>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         }
 
-        async function send() {
+        async function send(tradicaoSelecionada) {
             const input = document.getElementById("inp"); const texto = input.value.trim(); if (!texto) return;
-            const tradicaoSelecionada = document.getElementById("selectTradicao").value;
             
             input.value = ""; const chat = document.getElementById("chat");
             chat.innerHTML += `<div class="msg msg-user">${texto}</div>`;
@@ -129,5 +132,6 @@
     </script>
 </body>
 </html>
+
 
 
