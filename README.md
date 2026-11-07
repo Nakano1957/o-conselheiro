@@ -1,8 +1,12 @@
 # O Conselheiro 🕊️
 
-O Conselheiro é um aplicativo devocional inteligente desenhado para oferecer conforto espiritual, sabedoria e respostas práticas baseadas na Bíblia Sagrada, utilizando a **Técnica Richard Feynman** para simplificar conceitos e falar direto ao coração humano.
+"O Conselheiro é um aplicativo de apoio e orientação baseado em princípios cristãos,  oferece conforto espiritual, sabedoria prática e acolhimento para os desafios cotidianos. usa uma metodologia de comunicação simples, direta e acessível, o aplicativo traduz conceitos profundos de fé em respostas claras que falam direto ao coração humano, servindo como um guia seguro para a mente e a alma."
+
 
 ### ✨ Funcionalidades
-- **Estrutura Feynman:** Respostas divididas didaticamente em quatro blocos fixos.
-- **Ecumenismo:** Suporte e respeito às tradições Católica e Evangélica.
-- **Membresia Parceira:** Modelo sustentável mantido por corações voluntários.
+
+• Acolhimento Inteligente: Canal de diálogo interativo para desabafos e dúvidas, que devolve palavras de paz, ânimo e direcionamento com base na ética cristã.
+
+• Sabedoria Simplificada: Reflexões e pílulas diárias de sabedoria traduzidas de forma extremamente clara e descomplicada, fáceis de aplicar na rotina.
+
+• Alívio Emocional e Espiritual: Direcionamentos focados no combate à ansiedade, ao estresse e às dores emocionais, oferecendo uma perspectiva de esperança e fé.
