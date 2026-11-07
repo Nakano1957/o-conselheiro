@@ -48,7 +48,7 @@ async def obter_conselho(request: ConselhoRequest):
     )
     
     try:
-        # Modelo homologado e ativo da plataforma Groq
+        # Modelo homologado e ativo na plataforma Groq
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_instruction},
@@ -58,13 +58,14 @@ async def obter_conselho(request: ConselhoRequest):
             temperature=0.3,
         )
         
+        # Extração ultra segura da resposta da IA
         try:
             conselho = chat_completion.choices[0].message.content
-        except (AttributeError, TypeError, IndexError):
+        except Exception:
             try:
-                conselho = chat_completion.choices['message']['content']
-            except Exception:
-                conselho = str(chat_completion)
+                conselho = chat_completion.choices['choices'][0]['message']['content']
+            except Exception as e:
+                conselho = f"#### **Erro de Processamento:**\nNão consegui extrair o texto. Detalhe: {str(e)}"
 
         # Aplica a higienização de termos
         conselho_higienizado = ecumenizar_texto(conselho)
@@ -85,4 +86,6 @@ def home():
     return {
         "status": "API Online, mas o arquivo index.html não foi achado na raiz."
     }
+    
+   
 
