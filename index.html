@@ -13,7 +13,7 @@
         .app-container { width: 100%; max-width: 420px; height: 100dvh; background: #1e293b; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; }
         @media (min-width: 640px) { .app-container { height: 90vh; border-radius: 16px; } header { border-top-left-radius: 16px; border-top-right-radius: 16px; } footer { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; } }
         
-        /* Topo estratégico livre para monetização */
+        /* Topo limpo guardando o espaço comercial do Patrocinador */
         header { background: #020617; padding: 12px 20px; border-bottom: 1px solid #334155; text-align: center; position: relative; }
         header h1 { font-size: 18px; color: #fbbf24; font-weight: bold; }
         .patrocinio-space { font-size: 11px; color: #64748b; margin-top: 2px; font-style: italic; }
@@ -25,24 +25,18 @@
         .msg-ia { background: rgba(51, 65, 85, 0.5); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.05); align-self: flex-start; }
         .msg-user { background: rgba(251, 191, 36, 0.15); color: #fff; border: 1px solid rgba(251, 191, 36, 0.3); align-self: flex-end; margin-left: auto; }
         
-        /* Rodapé com campo máximo e dois botões de ação */
+        /* Botões dinâmicos que aparecem na conversa */
+        .opcoes-container { display: flex; gap: 10px; width: 100%; margin-top: 5px; align-self: flex-start; max-width: 85%; }
+        .btn-opcao { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 10px; color: #fff; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
+        .btn-catolica { border-color: #fbbf24; color: #fbbf24; }
+        .btn-evangelica { border-color: #38bdf8; color: #38bdf8; }
+        
+        /* Rodapé com campo máximo e botão único */
         footer { padding: 12px; background: #020617; border-top: 1px solid #334155; }
-        .input-container { display: flex; flex-direction: column; gap: 10px; }
-        
-        /* Campo de texto expandido ocupando a linha inteira */
-        .input-group-top { width: 100%; }
-        .input-group-top input { width: 100%; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 14px; color: #fff; font-size: 15px; outline: none; }
-        .input-group-top input:focus { border-color: #fbbf24; }
-        
-        /* Linha com os dois botões de envio lado a lado */
-        .buttons-group { display: flex; gap: 10px; width: 100%; }
-        .btn-enviar { flex: 1; background: #334155; color: #fff; border: 1px solid #475569; border-radius: 12px; padding: 12px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
-        
-        /* Destorcer cores para dar identidade aos botões */
-        .btn-catolica { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.05); }
-        .btn-evangelica { border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.05); }
-        .btn-catolica:active { background: #fbbf24; color: #0f172a; }
-        .btn-evangelica:active { background: #38bdf8; color: #0f172a; }
+        .input-group { display: flex; gap: 8px; align-items: center; }
+        .input-group input { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 12px; padding: 14px; color: #fff; font-size: 15px; outline: none; }
+        .input-group input:focus { border-color: #fbbf24; }
+        .btn-enviar { background: #fbbf24; color: #0f172a; border: none; border-radius: 12px; padding: 13px 18px; font-weight: bold; font-size: 16px; cursor: pointer; }
         
         .loader { font-style: italic; color: #94a3b8; font-size: 14px; padding-left: 4px; }
         h4 { margin-top: 12px; margin-bottom: 4px; color: #fbbf24; font-size: 16px; }
@@ -58,35 +52,27 @@
         </header>
         
         <div id="chat" class="chat-box">
-            <!-- Chamada inicial limpa e acolhedora -->
-            <div class="msg msg-ia">Olá, meu filho. O que está afligindo o seu coração hoje?</div>
+            <!-- 2. Alteração realizada: Texto de abertura acolhedor e limpo -->
+            <div class="msg msg-ia">Olá! Que bom ter você aqui. O que está afligindo o seu coração hoje?</div>
         </div>
         
         <footer>
-            <div class="input-container">
-                <!-- Campo de digitação expandido -->
-                <div class="input-group-top">
-                    <input type="text" id="inp" placeholder="Desabafe aqui ou digite sua dúvida!">
-                </div>
-                <!-- Dois botões de envio com suas respectivas setas de ação -->
-                <div class="buttons-group">
-                    <button class="btn-enviar btn-catolica" onclick="send('Católica')">🕊️ Católica ➔</button>
-                    <button class="btn-enviar btn-evangelica" onclick="send('Evangélica')">📖 Evangélica ➔</button>
-                </div>
+            <div class="input-group">
+                <!-- 3. Alteração realizada: Campo expandido máximo -->
+                <input type="text" id="inp" placeholder="Desabafe aqui ou digite sua dúvida!" onkeypress="if(event.key==='Enter') iniciarFluxo()">
+                <button class="btn-enviar" onclick="iniciarFluxo()">➔</button>
             </div>
         </footer>
     </div>
 
     <script>
+        let perguntaPendente = "";
         let deferredPrompt;
         const btnInstalar = document.getElementById('btnInstalar');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            btnInstalar.style.display = 'block';
+            e.preventDefault(); deferredPrompt = e; btnInstalar.style.display = 'block';
         });
-
         btnInstalar.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -95,7 +81,6 @@
                 deferredPrompt = null;
             }
         });
-
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch", (e) => {});');
         }
@@ -104,20 +89,49 @@
             return texto.replace(/\n/g, '<br>').replace(/#### \*\*([^*]+):\*\*/g, '<h4><b>$1:</b></h4>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         }
 
-        async function send(tradicaoSelecionada) {
-            const input = document.getElementById("inp"); const texto = input.value.trim(); if (!texto) return;
+        // Fluxo Inteligente: Captura a pergunta e oferece as opções sem criar barreiras
+        function iniciarFluxo() {
+            const input = document.getElementById("inp"); 
+            const texto = input.value.trim(); 
+            if (!texto) return;
             
-            input.value = ""; const chat = document.getElementById("chat");
+            perguntaPendente = texto;
+            input.value = ""; 
+            
+            const chat = document.getElementById("chat");
+            // Sobe o desabafo do usuário
             chat.innerHTML += `<div class="msg msg-user">${texto}</div>`;
+            
+            // Cria a pergunta de acolhimento do Conselheiro com os dois botões
+            const idEscolha = "escolha_" + Date.now();
+            chat.innerHTML += `
+                <div id="${idEscolha}">
+                    <div class="msg msg-ia">Para te aconselhar melhor pelos princípios cristãos, qual visão faz mais sentido para você?</div>
+                    <div class="opcoes-container">
+                        <button class="btn-opcao btn-catolica" onclick="enviarConselho('Católica', '${idEscolha}')">🕊️ Católica</button>
+                        <button class="btn-opcao btn-evangelica" onclick="enviarConselho('Evangélica', '${idEscolha}')">📖 Evangélica</button>
+                    </div>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function enviarConselho(tradicao, idRemover) {
+            // Remove os botões de escolha da tela para manter o chat limpo
+            document.getElementById(idRemover).remove();
+            
+            const chat = document.getElementById("chat");
             const loaderId = "loader_" + Date.now();
             chat.innerHTML += `<div id="${loaderId}" class="loader">O Conselheiro está refletindo...</div>`;
             chat.scrollTop = chat.scrollHeight;
+            
             try {
                 const response = await fetch("/api/conselho", {
                     method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ usuario_id: "user_mvp", pergunta: texto, tradicao: tradicaoSelecionada })
+                    body: JSON.stringify({ usuario_id: "user_mvp", pergunta: perguntaPendente, tradicao: tradicao })
                 });
-                const data = await response.json(); document.getElementById(loaderId).remove();
+                const data = await response.json(); 
+                document.getElementById(loaderId).remove();
                 
                 if (data && data.conselho) {
                     chat.innerHTML += `<div class="msg msg-ia">${formatarTexto(data.conselho)}</div>`;
@@ -132,6 +146,7 @@
     </script>
 </body>
 </html>
+
 
 
 
